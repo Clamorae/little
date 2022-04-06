@@ -194,7 +194,17 @@ void build_solution()
     return;
 }
 
+/*int min(int licol, int isCol, double matrix){
+    if (isCol){
 
+    }else{
+        for (int i = 0; i < count; i++)
+        {
+        
+        }
+        
+    }
+}*/
 
 
 /**
@@ -203,27 +213,43 @@ void build_solution()
 void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eval_node_parent)
 {
 
-    if (iteration == NBR_TOWNS)
+    /*if (iteration == NBR_TOWNS)
     {
         build_solution ();
         return;
-    }
+    }*/
 
     /* Do the modification on a copy of the distance matrix */
     double d[NBR_TOWNS][NBR_TOWNS] ;
     memcpy (d, d0, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    int i, j ;
+    int i, j, buffer_i,buffer_j,local_min ;
 
     double eval_node_child = eval_node_parent;
+    for ( i = 0; i < NBR_TOWNS; i++){
+        local_min = 99999;
+        for ( j = 0; j < NBR_TOWNS; j++){
+            if (d[i][j]!=-1 && d[i][j]<local_min){
+                local_min = d[i][j];
+                buffer_j = j;
+            }
+        }
+        d[i][buffer_j]=0;
+        eval_node_child+=local_min;
+    }
 
-    /**
-     * substract the min of the rows and the min of the columns
-     * and update the evaluation of the current node
-     *  TO COMPLETE
-     *  ...
-     *  ...
-     */
+    for ( i = 0; i < NBR_TOWNS; i++){
+        local_min = 99999;
+        for ( j = 0; j < NBR_TOWNS; j++){
+            if (d[j][i]!=-1 && d[j][i]<local_min){
+                local_min = d[j][i];
+                buffer_j = j;
+            }
+        }
+        d[buffer_j][i]=0;
+        eval_node_child+=local_min;
+    }
+    print_matrix(d);
 
 
     /* Cut : stop the exploration of this node */
@@ -315,6 +341,7 @@ int main (int argc, char* argv[])
     printf ("\n") ;
 
     double nearest_neighbour = build_nearest_neighbour() ;
+    //little_algorithm(dist,6,0);
 
     /** Little : uncomment when needed
      *
