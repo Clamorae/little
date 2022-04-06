@@ -194,17 +194,27 @@ void build_solution()
     return;
 }
 
-/*int min(int licol, int isCol, double matrix){
+int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS]){
+    int local_min=99999;
+    int place;
     if (isCol){
-
-    }else{
-        for (int i = 0; i < count; i++)
-        {
-        
+        for (int i = 0; i < NBR_TOWNS; i++){
+            if(matrix[i][licol]<local_min){
+                local_min=matrix[i][licol];
+                place = i;
+            }
         }
-        
+    }else{
+        for (int i = 0; i < sizeof(matrix[0]); i++){
+            if(matrix[licol][i]<local_min){
+                local_min=matrix[licol][i];
+                place = i;
+            }
+        }
     }
-}*/
+    int result[]={local_min,place};
+    return(result);
+}
 
 
 /**
@@ -250,6 +260,7 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
         eval_node_child+=local_min;
     }
     print_matrix(d);
+    //ANCHOR create two array with coordinates of the zero
 
 
     /* Cut : stop the exploration of this node */
