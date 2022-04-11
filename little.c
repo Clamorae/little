@@ -199,21 +199,22 @@ int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS]){
     int place;
     if (isCol){
         for (int i = 0; i < NBR_TOWNS; i++){
-            if(matrix[i][licol]<local_min){
+            if(matrix[i][licol]!=-1 && matrix[i][licol]<local_min){
                 local_min=matrix[i][licol];
                 place = i;
             }
         }
     }else{
         for (int i = 0; i < sizeof(matrix[0]); i++){
-            if(matrix[licol][i]<local_min){
+            if(matrix[i][licol]!=-1 && matrix[licol][i]<local_min){
                 local_min=matrix[licol][i];
                 place = i;
             }
         }
     }
     int result[]={local_min,place};
-    return(result);
+    int* p= result;
+    return(p);
 }
 
 
@@ -237,29 +238,19 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
 
     double eval_node_child = eval_node_parent;
     for ( i = 0; i < NBR_TOWNS; i++){
-        local_min = 99999;
-        for ( j = 0; j < NBR_TOWNS; j++){
-            if (d[i][j]!=-1 && d[i][j]<local_min){
-                local_min = d[i][j];
-                buffer_j = j;
-            }
-        }
-        d[i][buffer_j]=0;
-        eval_node_child+=local_min;
+        int* result = getMin(i,1,d);
+        d[i][result[1]]=0;
+        eval_node_child+=result[0];
     }
 
     for ( i = 0; i < NBR_TOWNS; i++){
-        local_min = 99999;
-        for ( j = 0; j < NBR_TOWNS; j++){
-            if (d[j][i]!=-1 && d[j][i]<local_min){
-                local_min = d[j][i];
-                buffer_j = j;
-            }
-        }
-        d[buffer_j][i]=0;
-        eval_node_child+=local_min;
+        int* result = getMin(i,1,d);
+        d[result[1]][i]=0;
+        eval_node_child+=result[0];
     }
     print_matrix(d);
+    printf ("Hit RETURN!\n") ;
+    getchar() ;
     //ANCHOR create two array with coordinates of the zero
 
 
@@ -352,7 +343,7 @@ int main (int argc, char* argv[])
     printf ("\n") ;
 
     double nearest_neighbour = build_nearest_neighbour() ;
-    //little_algorithm(dist,6,0);
+    little_algorithm(dist,6,0);
 
     /** Little : uncomment when needed
      *
