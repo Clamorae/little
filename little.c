@@ -195,7 +195,7 @@ void build_solution()
 }
 
 int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int current){
-    int local_min=99999;
+    float local_min=99999.0;
     int place;
     if (isCol){
         for (int i = 0; i < NBR_TOWNS; i++){
@@ -214,7 +214,6 @@ int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int curren
     }
     int result[]={local_min,place};
     int* p= result;
-    printf("%d\n",result[0]);
     return(p);
 }
 
@@ -261,28 +260,28 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
      */
     /* row and column of the zero with the max penalty */
     int izero=-1, jzero=-1 ;
-    int penalitie = 0;
-    int* yBufferPen;
-    int* xBufferPen;
+    int xMin,yMin,penalitie = 0;
+    int* BufferPen;
     for (int i = 0; i < NBR_TOWNS; i++){
         for (int j = 0; j < NBR_TOWNS;j++){
             if (d[i][j] == 0.0){
-                xBufferPen=getMin(i,0,d,j);
-                yBufferPen=getMin(j,1,d,i);
-                if (penalitie<xBufferPen[0]+yBufferPen[0]){
-                    penalitie=xBufferPen[0]+yBufferPen[0];
+                BufferPen=getMin(j,1,d,i);
+                yMin = BufferPen[0];
+                BufferPen=getMin(i,0,d,j);
+                xMin = BufferPen[0];
+                if (penalitie<xMin+yMin){
+                    penalitie=xMin+yMin;
                     izero = i;
                     jzero = j;
                 }
-                printf("i:%d,j:%dx:%d,y:%d,p:%d\n",i,j,xBufferPen[0],yBufferPen[0],penalitie);
-                printf ("Hit RETURN!\n") ;
-                getchar();
             }
         }
     }
     if(izero==-1){
         printf("solution infeasible\n");
     }else{
+        starting_town[iteration]=izero;
+        ending_town[iteration]=jzero;
         printf("x:%d,y:%d,p:%d\n",izero,jzero,penalitie);
     }
     
