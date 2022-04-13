@@ -194,18 +194,18 @@ void build_solution()
     return;
 }
 
-int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int current){
+int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int current,int iteration){
     float local_min=99999.0;
     int place;
     if (isCol){
-        for (int i = 0; i < NBR_TOWNS; i++){
+        for (int i = 0; i < NBR_TOWNS-iteration; i++){
             if(matrix[i][licol]!=-1 && matrix[i][licol]<local_min && i!=current){
                 local_min=matrix[i][licol];
                 place = i;
             }
         }
     }else{
-        for (int i = 0; i < NBR_TOWNS; i++){
+        for (int i = 0; i < NBR_TOWNS-iteration; i++){
             if(matrix[licol][i]!=-1 && matrix[licol][i]<local_min && i!=current){
                 local_min=matrix[licol][i];
                 place = i;
@@ -229,45 +229,36 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     int i, j, buffer_i,buffer_j,local_min ;
 
     double eval_node_child = eval_node_parent;
-    for ( i = 0; i < NBR_TOWNS; i++){
-        int* result = getMin(i,0,d,-1);
+    for ( i = 0; i < NBR_TOWNS-iteration; i++){
+        int* result = getMin(i,0,d,-1,iteration);
         d[i][result[1]]=0;
         eval_node_child+=result[0];
     }
 
-    for ( i = 0; i < NBR_TOWNS; i++){
-        int* result = getMin(i,1,d,-1);
+    for ( i = 0; i < NBR_TOWNS-iteration; i++){
+        int* result = getMin(i,1,d,-1,iteration);
         d[result[1]][i]=0;
         eval_node_child+=result[0];
     }
     print_matrix(d);
     printf ("Hit RETURN!\n") ;
     getchar();
-    //ANCHOR create two array with coordinates of the zero
-
-
-    /* Cut : stop the exploration of this node 
-    if (best_eval>=0 && eval_node_child >= best_eval)
-        return;*/
 
 
     /**
      *  Compute the penalities to identify the zero with max penalty
      *  If no zero in the matrix, then return, solution infeasible
-     *  TO COMPLETE
-     *  ...
-     *  ...
      */
     /* row and column of the zero with the max penalty */
     int izero=-1, jzero=-1 ;
     int xMin,yMin,penalitie = 0;
     int* BufferPen;
-    for (int i = 0; i < NBR_TOWNS; i++){
-        for (int j = 0; j < NBR_TOWNS;j++){
+    for (int i = 0; i < NBR_TOWNS-iteration; i++){
+        for (int j = 0; j < NBR_TOWNS-iteration;j++){
             if (d[i][j] == 0.0){
-                BufferPen=getMin(j,1,d,i);
+                BufferPen=getMin(j,1,d,i,iteration);
                 yMin = BufferPen[0];
-                BufferPen=getMin(i,0,d,j);
+                BufferPen=getMin(i,0,d,j,iteration);
                 xMin = BufferPen[0];
                 if (penalitie<xMin+yMin){
                     penalitie=xMin+yMin;
@@ -289,21 +280,22 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /**
      *  Store the row and column of the zero with max penalty in
      *  starting_town and ending_town
-     *  TO COMPLETE
-     *  ...
-     *  ...
      */
 
     /* Do the modification on a copy of the distance matrix */
     double d2[NBR_TOWNS][NBR_TOWNS] ;
     memcpy (d2, d, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    /**
+    /*
      *  Modify the matrix d2 according to the choice of the zero with the max penalty
-     *  TO COMPLETE
-     *  ...
-     *  ...
      */
+    for (int i = 0; i < NBR_TOWNS; i++){
+        for (int j = 0; j < NBR_TOWNS; j++){
+            if (i==starting_town[iteration] || j==ending_town[iteration]){
+                d2[i][j] = -1;
+            }
+        }
+    }
 
     /* Explore left child node according to given choice */
     little_algorithm(d2, iteration + 1, eval_node_child);
@@ -311,7 +303,7 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /* Do the modification on a copy of the distance matrix */
     memcpy (d2, d, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    /**
+    /**ANCHOR
      *  Modify the dist matrix to explore the other possibility : the non-choice
      *  of the zero with the max penalty
      *  TO COMPLETE
@@ -360,18 +352,16 @@ int main (int argc, char* argv[])
     printf ("\n") ;
 
     double nearest_neighbour = build_nearest_neighbour() ;
-    little_algorithm(dist,6,0);
 
-    /** Little : uncomment when needed
-     *
-     *  int iteration = 0 ;
-     *  double lowerbound = 0.0 ;
-     *
-     *  little_algorithm(dist, iteration, lowerbound) ;
-     *
-     *  printf("Best solution:") ;
-     *  print_solution (best_solution, best_eval) ;
-     */
+    //Little 
+    
+    int iteration = 0 ;
+    double lowerbound = 0.0 ;
+     
+    little_algorithm(dist, iteration, lowerbound) ;
+    
+    printf("Best solution:") ;
+    print_solution (best_solution, best_eval) ;
 
     printf ("Hit RETURN!\n") ;
     getchar() ;
