@@ -194,26 +194,26 @@ void build_solution()
     return;
 }
 
-int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int current,int iteration){
-    float local_min=99999.0;
+double* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int current,int iteration){
+    double local_min=99999.0;
     int place;
     if (isCol){
-        for (int i = 0; i < NBR_TOWNS-iteration; i++){
+        for (int i = 0; i < NBR_TOWNS; i++){
             if(matrix[i][licol]!=-1 && matrix[i][licol]<local_min && i!=current){
                 local_min=matrix[i][licol];
                 place = i;
             }
         }
     }else{
-        for (int i = 0; i < NBR_TOWNS-iteration; i++){
+        for (int i = 0; i < NBR_TOWNS; i++){
             if(matrix[licol][i]!=-1 && matrix[licol][i]<local_min && i!=current){
                 local_min=matrix[licol][i];
                 place = i;
             }
         }
     }
-    int result[]={local_min,place};
-    int* p= result;
+    double result[]={local_min,place};
+    double* p= result;
     return(p);
 }
 
@@ -223,21 +223,28 @@ int* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int curren
  */
 void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eval_node_parent)
 {
-
     double d[NBR_TOWNS][NBR_TOWNS] ;
     memcpy (d, d0, NBR_TOWNS*NBR_TOWNS*sizeof(double));
     int i, j, buffer_i,buffer_j,local_min ;
 
     double eval_node_child = eval_node_parent;
-    for ( i = 0; i < NBR_TOWNS-iteration; i++){
-        int* result = getMin(i,0,d,-1,iteration);
-        d[i][result[1]]=0;
+    for ( i = 0; i < NBR_TOWNS; i++){
+        double* result = getMin(i,0,d,-1,iteration);
+        for (int j = 0; j < NBR_TOWNS; j++){
+            if (d[i][j]!=-1){
+                d[i][j]-=result[0];
+            }
+        }
         eval_node_child+=result[0];
     }
 
-    for ( i = 0; i < NBR_TOWNS-iteration; i++){
-        int* result = getMin(i,1,d,-1,iteration);
-        d[result[1]][i]=0;
+    for ( i = 0; i < NBR_TOWNS; i++){
+        double* result = getMin(i,1,d,-1,iteration);
+        for (int j = 0; j < NBR_TOWNS; j++){
+            if (d[i][j]!=-1){
+                d[j][i]-=result[0];
+            }
+        }
         eval_node_child+=result[0];
     }
     print_matrix(d);
@@ -252,9 +259,9 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /* row and column of the zero with the max penalty */
     int izero=-1, jzero=-1 ;
     int xMin,yMin,penalitie = 0;
-    int* BufferPen;
-    for (int i = 0; i < NBR_TOWNS-iteration; i++){
-        for (int j = 0; j < NBR_TOWNS-iteration;j++){
+    double* BufferPen;
+    for (int i = 0; i < NBR_TOWNS; i++){
+        for (int j = 0; j < NBR_TOWNS;j++){
             if (d[i][j] == 0.0){
                 BufferPen=getMin(j,1,d,i,iteration);
                 yMin = BufferPen[0];
@@ -289,13 +296,17 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /*
      *  Modify the matrix d2 according to the choice of the zero with the max penalty
      */
+    d2[jzero][izero] = -1;
     for (int i = 0; i < NBR_TOWNS; i++){
         for (int j = 0; j < NBR_TOWNS; j++){
             if (i==starting_town[iteration] || j==ending_town[iteration]){
-                d2[i][j] = -1;
+                d2[i][j] = -1.0;
             }
         }
     }
+    
+    print_solution(starting_town,eval_node_child);
+    
 
     /* Explore left child node according to given choice */
     little_algorithm(d2, iteration + 1, eval_node_child);
@@ -303,14 +314,12 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /* Do the modification on a copy of the distance matrix */
     memcpy (d2, d, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    /**ANCHOR
+    /**
      *  Modify the dist matrix to explore the other possibility : the non-choice
      *  of the zero with the max penalty
-     *  TO COMPLETE
-     *  ...
-     *  ...
      */
-
+    eval_node_child+=penalitie;
+    d2[izero][jzero]=-1;
     /* Explore right child node according to non-choice */
     little_algorithm(d2, iteration, eval_node_child);
 
