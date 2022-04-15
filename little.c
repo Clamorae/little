@@ -81,28 +81,18 @@ void print_solution(int* sol, double eval)
 double evaluation_solution(int* sol)
 {
     double eval=0 ;
-    int i ;
-    for (i=0; i<NBR_TOWNS-1; i++){
-        eval += dist[sol[i]][sol[i+1]] ;
-    }
-    eval += dist[sol[NBR_TOWNS-1]][sol[0]] ;
-
-    return eval ;
-
-}
-
-int* compute_path(int* starting_town,int* ending_town){
-    int j;
-    int path[NBR_TOWNS];
-    for (int i = 0; i < NBR_TOWNS; i++){
-        j=0;
-        while (i!=starting_town[j]){
-            j++;
+    if (sol[0]==sol[1]){
+        return 9999999999.0;
+    }else{
+        int i ;
+        for (i=0; i<NBR_TOWNS-1; i++){
+            eval += dist[sol[i]][sol[i+1]] ;
         }
-        
+        eval += dist[sol[NBR_TOWNS-1]][sol[0]] ;
+
+        return eval ;
     }
 }
-
 
 
 /**
@@ -157,9 +147,25 @@ double build_nearest_neighbour()
  */
 void build_solution()
 {
-    int i, solution[NBR_TOWNS] ;
+    printf ("build\n");
+    int cherche, j, solution[NBR_TOWNS];
+    solution[0]=0;
+    for (int i = 0; i < NBR_TOWNS; i++){
+        cherche = solution[i];
+        j=0;
+        while (starting_town[j]!=cherche && j<NBR_TOWNS){
+            j++;
+        }
+        if(j>=NBR_TOWNS){
+            printf("Non Hamiltonien\n");
+            return ;            
+        }else{
+            solution[i+1]=ending_town[j];
+        }        
+    }
+    
 
-    int indiceCour = 0;
+    /*int indiceCour = 0;
     int villeCour = 0;
 
     while (indiceCour < NBR_TOWNS)
@@ -172,7 +178,7 @@ void build_solution()
         {
             if (solution[i] == villeCour)
             {
-                /* printf ("cycle non hamiltonien\n") ; */
+                printf ("cycle non hamiltonien\n");
                 return;
             }
         }
@@ -189,14 +195,14 @@ void build_solution()
             i++;
         }
         indiceCour++;
-    }
+    }*/
 
-    double eval = evaluation_solution(solution) ;
+    double eval = evaluation_solution(solution);
 
     if (best_eval<0 || eval < best_eval)
     {
         best_eval = eval ;
-        for (i=0; i<NBR_TOWNS; i++)
+        for (int i=0; i<NBR_TOWNS; i++)
             best_solution[i] = solution[i] ;
         printf ("New best solution: ") ;
         print_solution (solution, best_eval) ;
@@ -235,7 +241,7 @@ double* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int cur
  *  Little Algorithm
  */
 void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eval_node_parent)
-{
+{    
     double d[NBR_TOWNS][NBR_TOWNS] ;
     memcpy (d, d0, NBR_TOWNS*NBR_TOWNS*sizeof(double));
     int i, j, buffer_i,buffer_j,local_min ;
@@ -260,9 +266,6 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
         }
         eval_node_child+=result[0];
     }
-    print_matrix(d);
-    printf ("Hit RETURN!\n") ;
-    getchar();
 
 
     /**
@@ -288,12 +291,16 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
             }
         }
     }
+    //print_matrix(d);
+    /*printf ("Hit RETURN!\n") ;
+    getchar();*/
     if(izero==-1){
-        printf("solution infeasible\n");
+        build_solution();
+        print_solution(best_solution,eval_node_child);
+        return;
     }else{
         starting_town[iteration]=izero;
         ending_town[iteration]=jzero;
-        printf("x:%d,y:%d,p:%d\n",izero,jzero,penalitie);
     }
     
 
@@ -317,8 +324,9 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
             }
         }
     }
-    
-    print_solution(starting_town,eval_node_child);
+
+    /*build_solution();
+    print_solution(best_solution,eval_node_child);*/
     
 
     /* Explore left child node according to given choice */
@@ -339,11 +347,6 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
 }
 
 
-
-
-/**
- *
- */
 int main (int argc, char* argv[])
 {
 
@@ -369,9 +372,9 @@ int main (int argc, char* argv[])
         }
     }
 
-    printf ("Distance Matrix:\n") ;
+    /*printf ("Distance Matrix:\n") ;
     print_matrix (dist) ;
-    printf ("\n") ;
+    printf ("\n") ;*/
 
     double nearest_neighbour = build_nearest_neighbour() ;
 
