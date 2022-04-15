@@ -82,8 +82,7 @@ double evaluation_solution(int* sol)
 {
     double eval=0 ;
     int i ;
-    for (i=0; i<NBR_TOWNS-1; i++)
-    {
+    for (i=0; i<NBR_TOWNS-1; i++){
         eval += dist[sol[i]][sol[i+1]] ;
     }
     eval += dist[sol[NBR_TOWNS-1]][sol[0]] ;
@@ -92,6 +91,17 @@ double evaluation_solution(int* sol)
 
 }
 
+int* compute_path(int* starting_town,int* ending_town){
+    int j;
+    int path[NBR_TOWNS];
+    for (int i = 0; i < NBR_TOWNS; i++){
+        j=0;
+        while (i!=starting_town[j]){
+            j++;
+        }
+        
+    }
+}
 
 
 
@@ -215,7 +225,6 @@ double* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int cur
     if (local_min==99999.0){
         local_min=0.0;
     }
-    
     double result[]={local_min,place};
     double* p= result;
     return(p);
