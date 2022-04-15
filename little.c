@@ -212,6 +212,10 @@ double* getMin(int licol, int isCol, double matrix[NBR_TOWNS][NBR_TOWNS],int cur
             }
         }
     }
+    if (local_min==99999.0){
+        local_min=0.0;
+    }
+    
     double result[]={local_min,place};
     double* p= result;
     return(p);
