@@ -1,0 +1,4 @@
+(time in seconds)
+Little :
+    6 : 0.007
+    10 : 0.04
