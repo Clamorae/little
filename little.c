@@ -162,7 +162,7 @@ void build_solution()
         {
             if (solution[i] == villeCour)
             {
-                /* printf ("cycle non hamiltonien\n") ; */
+                printf ("cycle non hamiltonien\n"); 
                 return;
             }
         }
@@ -250,11 +250,13 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
             }
         }
     }
-    printf("%f\n",eval_node_child);
-    print_matrix(d);
-    getchar();
+    /*printf("%f\n",eval_node_child);
+    print_matrix(d);*/
 
-
+    
+    /* Cut : stop the exploration of this node */
+    if (best_eval>=0 && eval_node_child >= best_eval)
+        return;
 
     int lineMaxPen, colMaxPen;
     double lineMin, colMin;
@@ -286,46 +288,33 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     }
     if (maxPen==-1.0){
         printf("Solution infeasible\n");
+        return;
     }else{
         starting_town[iteration] = colMaxPen;
         ending_town[iteration] = lineMaxPen;
-        printf("pen:%f,x:%d,y:%d\n",maxPen,lineMaxPen,colMaxPen);
-        getchar();
+        /*printf("pen:%f,x:%d,y:%d\n",maxPen,lineMaxPen,colMaxPen);
+        getchar();*/
+    }
+
+
+    if (iteration==NBR_TOWNS){
+        build_solution;
     }
     
-    /* Cut : stop the exploration of this node */
-    if (best_eval>=0 && eval_node_child >= best_eval)
-        return;
-
-
-    /**
-     *  Compute the penalities to identify the zero with max penalty
-     *  If no zero in the matrix, then return, solution infeasible
-     *  TO COMPLETE
-     *  ...
-     *  ...
-     */
-    /* row and column of the zero with the max penalty */
-    int izero=-1, jzero=-1 ;
-
-    /**
-     *  Store the row and column of the zero with max penalty in
-     *  starting_town and ending_town
-     *  TO COMPLETE
-     *  ...
-     *  ...
-     */
 
     /* Do the modification on a copy of the distance matrix */
     double d2[NBR_TOWNS][NBR_TOWNS] ;
     memcpy (d2, d, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    /**
-     *  Modify the matrix d2 according to the choice of the zero with the max penalty
-     *  TO COMPLETE
-     *  ...
-     *  ...
-     */
+    for ( i = 0; i < NBR_TOWNS; i++){
+        for ( j = 0; j < NBR_TOWNS; j++){
+            if (i==lineMaxPen||j==colMaxPen){
+                d2[i][j] = -1.0;
+            }   
+        }
+    }
+    d2[colMaxPen][lineMaxPen]=-1.0;
+    
 
     /* Explore left child node according to given choice */
     little_algorithm(d2, iteration + 1, eval_node_child);
@@ -342,6 +331,8 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
      */
 
     /* Explore right child node according to non-choice */
+
+    d2[lineMaxPen][colMaxPen]=-1.0;
     little_algorithm(d2, iteration, eval_node_child);
 
 }
