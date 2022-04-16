@@ -284,10 +284,15 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
             }  
         }  
     }
-    printf("pen:%f,x:%d,y:%d\n",maxPen,lineMaxPen,colMaxPen);
-    getchar();
-
-
+    if (maxPen==-1.0){
+        printf("Solution infeasible\n");
+    }else{
+        starting_town[iteration] = colMaxPen;
+        ending_town[iteration] = lineMaxPen;
+        printf("pen:%f,x:%d,y:%d\n",maxPen,lineMaxPen,colMaxPen);
+        getchar();
+    }
+    
     /* Cut : stop the exploration of this node */
     if (best_eval>=0 && eval_node_child >= best_eval)
         return;
