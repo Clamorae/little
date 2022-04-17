@@ -13,7 +13,7 @@
 
 
 
-#define NBR_TOWNS 20
+#define NBR_TOWNS 25
 
 /* Distance matrix */
 double dist[NBR_TOWNS][NBR_TOWNS] ;
@@ -54,12 +54,12 @@ float coord[NBR_TOWNS][2]=
     {415.0, 635.0},
     {510.0, 875.0 }, 
     {560.0, 365.0},
-    /*{300.0, 465.0},
+    {300.0, 465.0},
     {520.0, 585.0},
     {480.0, 415.0},
     {835.0, 625.0},
     {975.0, 580.0},
-    {1215.0, 245.0},
+    /*{1215.0, 245.0},
     {1320.0, 315.0},
     {1250.0, 400.0},
     {660.0, 180.0},
@@ -241,7 +241,34 @@ void build_solution()
     return;
 }
 
+int search(int target,int current, int iteration){
+    int i = 0;
+    while (i<iteration){
+        if (starting_town[i] == current){
+            if (ending_town[i]==target){
+                return 1;
+            }else{
+                return (search(target,ending_town[i],iteration));
+            }
+            
+        }else{
+            i++;
+        }
+    }
+    return 0;
+}
 
+int is_cycle(int iteration){
+    int i = 0;
+    while (i<iteration){
+        if (search(starting_town[i],starting_town[i],iteration)){
+            return 1;
+        }else{
+            i++;
+        } 
+    }
+    return 0;
+}
 
 
 /**
@@ -252,6 +279,8 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
 
     if (iteration == NBR_TOWNS){
         build_solution ();
+        return;
+    }else if(is_cycle(iteration)){
         return;
     }
 
