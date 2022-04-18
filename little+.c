@@ -276,7 +276,6 @@ int is_cycle(int iteration){
  */
 void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eval_node_parent)
 {
-
     if (iteration == NBR_TOWNS){
         build_solution ();
         return;
@@ -332,17 +331,13 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
             }
         }
     }
-
-    /*printf ("iter: %d\n",iteration);
-    print_matrix(d);
-    getchar();*/
     
     /* Cut : stop the exploration of this node */
     if (best_eval>=0 && eval_node_child >= best_eval){
         return;
     }
 
-    /* get the min of each line and column and calculate whiche zero has the maximum penalitie*/
+    /* get the min of each line and column and calculate which zero has the maximum penalitie*/
     int lineMaxPen, colMaxPen;
     double lineMin, colMin;
     double maxPen = -1.0;
@@ -376,13 +371,8 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     }else{
         starting_town[iteration] = lineMaxPen;
         ending_town[iteration] = colMaxPen;
-        /*printf("pen:%f,x:%d,y:%d\n",maxPen,lineMaxPen,colMaxPen);
-        getchar();*/
     }
 
-
-    
-    
 
     /* Do the modification on a copy of the distance matrix */
     double d2[NBR_TOWNS][NBR_TOWNS] ;
@@ -403,15 +393,6 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /* Do the modification on a copy of the distance matrix */
     memcpy (d2, d, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    /**
-     *  Modify the dist matrix to explore the other possibility : the non-choice
-     *  of the zero with the max penalty
-     *  TO COMPLETE
-     *  ...
-     *  ...
-     */
-
-    /* Explore right child node according to non-choice */
 
     d2[lineMaxPen][colMaxPen]=-1.0;
     little_algorithm(d2, iteration, eval_node_child);

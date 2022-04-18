@@ -374,14 +374,6 @@ void little_algorithm(double d0[NBR_TOWNS][NBR_TOWNS], int iteration, double eva
     /* Do the modification on a copy of the distance matrix */
     memcpy (d2, d, NBR_TOWNS*NBR_TOWNS*sizeof(double)) ;
 
-    /**
-     *  Modify the dist matrix to explore the other possibility : the non-choice
-     *  of the zero with the max penalty
-     *  TO COMPLETE
-     *  ...
-     *  ...
-     */
-
     /* Explore right child node according to non-choice */
 
     d2[lineMaxPen][colMaxPen]=-1.0;
